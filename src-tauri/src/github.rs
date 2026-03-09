@@ -167,6 +167,10 @@ fn build_tree(flat: Vec<serde_json::Value>) -> Vec<TreeNode> {
             }
         }
     }
+    sort_tree(&mut result);
+    result
+}
+
 #[tauri::command]
 pub async fn fetch_branches(
     owner: String,
