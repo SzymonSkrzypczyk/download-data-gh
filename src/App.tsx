@@ -1,49 +1,43 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+"use client";
+import { RepoInput } from "@/components/RepoInput";
+import { TokenInput } from "@/components/TokenInput";
+import { RepoTree } from "@/components/RepoTree";
+import { DownloadPanel } from "@/components/DownloadPanel";
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <main className="h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground">
+      {/* Header */}
+      <header className="h-14 border-b flex items-center px-6 shrink-0 bg-card">
+        <h1 className="text-lg font-bold tracking-tight flex items-center gap-2">
+          <span className="bg-primary text-primary-foreground p-1 rounded">GH</span>
+          GitHub Directory Downloader
+        </h1>
+      </header>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Side: Inputs */}
+        <div className="w-[350px] border-right flex flex-col shrink-0 overflow-y-auto bg-muted/10">
+          <RepoInput />
+          <div className="px-4 pb-4">
+            <TokenInput />
+          </div>
+        </div>
+
+        {/* Center: Tree View */}
+        <div className="flex-1 border-r flex flex-col p-4 bg-background">
+          <RepoTree />
+        </div>
+
+        {/* Right Side: Download Panel */}
+        <div className="w-[350px] shrink-0 bg-muted/5 shadow-sm">
+          <DownloadPanel />
+        </div>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      <Toaster position="top-center" richColors />
     </main>
   );
 }

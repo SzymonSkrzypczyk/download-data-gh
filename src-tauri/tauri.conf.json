@@ -4,17 +4,19 @@
   "version": "0.1.0",
   "identifier": "com.szymo.download-data-gh",
   "build": {
-    "beforeDevCommand": "bun run dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "bun run build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "download-data-gh",
-        "width": 800,
-        "height": 600
+        "title": "GitHub Directory Downloader",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600
       }
     ],
     "security": {
