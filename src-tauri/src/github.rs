@@ -27,7 +27,7 @@ pub struct TreeNode {
     pub children: Option<Vec<TreeNode>>,
 }
 
-fn make_client(token: &Option<String>) -> reqwest::Client {
+pub fn make_client(token: &Option<String>) -> reqwest::Client {
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert("User-Agent", "github-dir-downloader/1.0".parse().unwrap());
     headers.insert("Accept", "application/vnd.github+json".parse().unwrap());
@@ -77,7 +77,16 @@ pub async fn fetch_repo_tree(
     state: State<'_, TokenState>,
 ) -> Result<Vec<TreeNode>, String> {
     let token = state.0.lock().unwrap().clone();
-    let client = make_client(&token);
+    fetch_repo_tree_internal(&owner, &repo, &branch, &token).await
+}
+
+pub async fn fetch_repo_tree_internal(
+    owner: &str,
+    repo: &str,
+    branch: &str,
+    token: &Option<String>,
+) -> Result<Vec<TreeNode>, String> {
+    let client = make_client(token);
 
     let url = format!(
         "https://api.github.com/repos/{}/{}/git/trees/{}?recursive=1",
@@ -133,8 +142,10 @@ fn build_tree(flat: Vec<serde_json::Value>) -> Vec<TreeNode> {
         map.insert(path, node);
     }
 
-    // Build hierarchy (bottom-up is easier with a map)
-    let paths: Vec<String> = map.keys().cloned().collect();
+    // Build hierarchy (bottom-up: process longest paths first)
+    let mut paths: Vec<String> = map.keys().cloned().collect();
+    paths.sort_by(|a, b| b.len().cmp(&a.len())); // Sort by length DESC
+
     for path in paths {
         if let Some(idx) = path.rfind('/') {
             let parent_path = &path[..idx];
@@ -144,6 +155,11 @@ fn build_tree(flat: Vec<serde_json::Value>) -> Vec<TreeNode> {
                     parent.children = Some(Vec::new());
                 }
                 parent.children.as_mut().unwrap().push(child);
+            } else {
+                // If parent is not in map, it might have been filtered out or it's a root node
+                // But since we sort by length desc, the parent SHOULD still be there if it's a dir.
+                // We'll put the child back for now if it's supposed to be a root (shouldn't happen here due to idx check)
+                map.insert(path, child); 
             }
         }
     }
