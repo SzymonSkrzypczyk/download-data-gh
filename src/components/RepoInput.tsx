@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Star, GitFork, Lock, Globe, ExternalLink, History, XCircle } from "lucide-react";
+import { Loader2, Star, GitFork, Lock, Globe, ExternalLink, History } from "lucide-react";
 import { useRepoStore } from "@/store/repoStore";
 import { RepoMeta, TreeNode } from "@/types/github";
 import { BranchSelector } from "@/components/BranchSelector";
